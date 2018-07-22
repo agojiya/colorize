@@ -10,9 +10,9 @@ def convert_to_grayscale(color_dir, grayscale_dir):
         return
 
     color_files = listdir(color_dir)
-    interval = floor(len(color_files) / 10)
+    interval = floor(len(color_files) / 50)
 
-    print("Converting training images into grayscale", end='')
+    print('Converting images', end='', flush=True)
     counter = 0
     images = [file for file in color_files if
               isfile(join(color_dir, file))]
@@ -23,5 +23,5 @@ def convert_to_grayscale(color_dir, grayscale_dir):
 
         counter += 1
         if counter % interval == 0:
-            print('.', end='')
+            print('.', end='', flush=True)
     print('DONE')
