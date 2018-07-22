@@ -25,3 +25,8 @@ def convert_to_grayscale(color_dir, grayscale_dir):
         if counter % interval == 0:
             print('.', end='', flush=True)
     print('DONE')
+
+
+def filter_by_variance(grayscale_dir):
+    """ TODO: Remove images that do not have enough variety
+    """
