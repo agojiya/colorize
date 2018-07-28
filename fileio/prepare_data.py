@@ -1,4 +1,4 @@
-from os import listdir
+from os import listdir, remove
 from os.path import isfile, join
 from math import floor
 
@@ -29,19 +29,28 @@ def convert_to_grayscale(color_dir, grayscale_dir):
 
 def filter_by_variance(color_dir, grayscale_dir):
     grayscale_image_files = listdir(grayscale_dir)
-    if len(grayscale_image_files) < len(listdir(color_dir)):
+    grayscale_size = len(grayscale_image_files)
+    if grayscale_size < len(listdir(color_dir)):
         # There are fewer grayscale images than color images meaning that the
         # images have already been filtered
         return
 
     import cv2
 
+    interval = floor(grayscale_size / 50)
+    counter, remove_counter = 0, 0
+    print('Filtering images', end='', flush=True)
     for image_file in grayscale_image_files:
-        image = cv2.imread(join(grayscale_dir, image_file),
-                           cv2.IMREAD_GRAYSCALE)
+        image_location = join(grayscale_dir, image_file)
+        image = cv2.imread(image_location, cv2.IMREAD_GRAYSCALE)
         _, stddev = cv2.meanStdDev(image)
         stddev = stddev[0][0]
 
-        if stddev <= 10:
-            # TODO: Remove the image
-            pass
+        if stddev <= 12:
+            remove(image_location)
+            remove_counter += 1
+
+        counter += 1
+        if counter % interval == 0:
+            print('.', end='', flush=True)
+    print('DONE', '(Removed', remove_counter, 'images)')
