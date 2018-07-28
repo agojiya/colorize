@@ -4,10 +4,10 @@ from math import floor
 
 
 def convert_to_grayscale(color_dir, grayscale_dir):
-    import cv2
-
     if len(listdir(grayscale_dir)) != 0:
         return
+
+    import cv2
 
     color_files = listdir(color_dir)
     interval = floor(len(color_files) / 50)
@@ -27,6 +27,21 @@ def convert_to_grayscale(color_dir, grayscale_dir):
     print('DONE')
 
 
-def filter_by_variance(grayscale_dir):
-    """ TODO: Remove images that do not have enough variety
-    """
+def filter_by_variance(color_dir, grayscale_dir):
+    grayscale_image_files = listdir(grayscale_dir)
+    if len(grayscale_image_files) < len(listdir(color_dir)):
+        # There are fewer grayscale images than color images meaning that the
+        # images have already been filtered
+        return
+
+    import cv2
+
+    for image_file in grayscale_image_files:
+        image = cv2.imread(join(grayscale_dir, image_file),
+                           cv2.IMREAD_GRAYSCALE)
+        _, stddev = cv2.meanStdDev(image)
+        stddev = stddev[0][0]
+
+        if stddev <= 10:
+            # TODO: Remove the image
+            pass
