@@ -4,6 +4,7 @@ from math import floor
 
 
 def convert_to_grayscale(color_dir, grayscale_dir):
+    """ Converting color training images into grayscale training images. """
     if len(listdir(grayscale_dir)) != 0:
         return
 
@@ -27,7 +28,8 @@ def convert_to_grayscale(color_dir, grayscale_dir):
     print('DONE')
 
 
-def filter_by_variance(color_dir, grayscale_dir):
+def filter_by_stddev(color_dir, grayscale_dir):
+    """ Filtering grayscale images with low standard deviation. """
     grayscale_image_files = listdir(grayscale_dir)
     grayscale_size = len(grayscale_image_files)
     if grayscale_size < len(listdir(color_dir)):
