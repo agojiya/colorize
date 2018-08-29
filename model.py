@@ -23,10 +23,10 @@ def create_generator_layer(generator_input, structure, label):
     structure[i+1] for 0<=i<=len(structure)/2. """
     layers = [generator_input]
     for i in range(int(len(structure) / 2)):
-        for layer_index in range(structure[i]):
+        for layer_index in range(structure[2 * i]):
             name = label + '-' + str(i) + '-' + str(layer_index)
             layer = tf.layers.conv2d(inputs=layers[-1], filters=1,
-                                     kernel_size=structure[i + 1],
+                                     kernel_size=structure[2 * i + 1],
                                      activation=tf.nn.relu, name=name)
             layers.append(layer)
     return tf.multiply(layers[-1], CONSTANT_255)
