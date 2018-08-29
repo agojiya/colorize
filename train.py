@@ -13,7 +13,7 @@ prepare_data.convert_to_grayscale(color_dir=TRAIN_COLOR_DIR,
 prepare_data.filter_by_stddev(color_dir=TRAIN_COLOR_DIR,
                               grayscale_dir=TRAIN_DIR)
 
-generator_input = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
-generator = model.create_generator(generator_input)
+grayscale_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
+colorizer = model.create_model(grayscale_in)
 
-real_data = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])
+color_out = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])

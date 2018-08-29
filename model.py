@@ -3,20 +3,20 @@ import tensorflow as tf
 CONSTANT_255 = tf.constant(255, dtype=tf.float32)
 
 
-def create_generator(generator_input):
+def create_model(generator_input):
     """ First attempt at a generator function. """
     shape = tf.shape(generator_input)
-    red = create_generator_layer(generator_input, [32, 8, 64, 16, 128, 32],
-                                 'R')
-    green = create_generator_layer(generator_input, [32, 8, 64, 16, 128, 32],
-                                   'G')
-    blue = create_generator_layer(generator_input, [32, 8, 64, 16, 128, 32],
-                                  'B')
+    red = create_model_layer(generator_input, [32, 8, 64, 16, 128, 32],
+                             'R')
+    green = create_model_layer(generator_input, [32, 8, 64, 16, 128, 32],
+                               'G')
+    blue = create_model_layer(generator_input, [32, 8, 64, 16, 128, 32],
+                              'B')
     return tf.reshape(tf.stack([red, green, blue], axis=4),
                       shape=[shape[0], shape[1], shape[2], 3])
 
 
-def create_generator_layer(generator_input, structure, label):
+def create_model_layer(generator_input, structure, label):
     """ Creates a conv2d network starting at <generator_input> according to
     <structure> with label <label>.
     Creates structure[i] conv2d layers with one filter and kernel size
