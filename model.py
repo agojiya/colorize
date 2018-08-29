@@ -5,6 +5,7 @@ CONSTANT_255 = tf.constant(255, dtype=tf.float32)
 
 def create_generator(generator_input):
     """ First attempt at a generator function. """
+    shape = tf.shape(generator_input)
     red = create_generator_layer(generator_input, [32, 8, 64, 16, 128, 32],
                                  'R')
     green = create_generator_layer(generator_input, [32, 8, 64, 16, 128, 32],
@@ -12,7 +13,7 @@ def create_generator(generator_input):
     blue = create_generator_layer(generator_input, [32, 8, 64, 16, 128, 32],
                                   'B')
     return tf.reshape(tf.stack([red, green, blue], axis=4),
-                      shape=[-1, -1, -1, 3])
+                      shape=[shape[0], shape[1], shape[2], 3])
 
 
 def create_generator_layer(generator_input, structure, label):
