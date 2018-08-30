@@ -14,6 +14,9 @@ prepare_data.filter_by_stddev(color_dir=TRAIN_COLOR_DIR,
                               grayscale_dir=TRAIN_DIR)
 
 grayscale_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
-colorizer = model.create_model(grayscale_in)
+colorizer_out = model.create_model(grayscale_in)
 
-color_out = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])
+color = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])
+
+loss = tf.reduce_sum(tf.squared_difference(colorizer_out, color))
+optimizer = tf.train.AdamOptimizer().minimize(loss)
