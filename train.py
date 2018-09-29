@@ -31,5 +31,9 @@ with tf.Session() as session:
     session.run(tf.global_variables_initializer())
 
     epoch, index = utils.get_highest_save_file(SAVE_DIR)
+    if epoch != 0:
+        save_file = SAVER_FORMAT.format(epoch, index)
+        saver.restore(session, save_path=str(path.join(SAVE_DIR, save_file)))
+        print('Loaded', epoch, 'epochs of training at', index)
 
     image_files = listdir(TRAIN_DIR)
