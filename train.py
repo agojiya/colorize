@@ -1,5 +1,5 @@
 from fileio import prepare_data, utils
-from os import path, listdir
+from os import path, listdir, mkdir
 
 import tensorflow as tf
 import model
@@ -7,9 +7,11 @@ import model
 BASE_DIR = path.join('X:', 'open-images-v4')
 TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
 TRAIN_DIR = path.join(BASE_DIR, 'train_grayscale')
-SAVE_DIR = path.join(BASE_DIR, 'colorize_saves')
 
+SAVE_DIR = path.join(BASE_DIR, 'colorize_saves')
 SAVER_FORMAT = 'conv2d_3-%s-%s'
+if not path.exists(SAVE_DIR):
+    mkdir(SAVE_DIR)
 
 prepare_data.convert_to_grayscale(color_dir=TRAIN_COLOR_DIR,
                                   grayscale_dir=TRAIN_DIR)
