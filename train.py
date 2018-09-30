@@ -1,8 +1,10 @@
-from fileio import prepare_data, utils
 from os import path, listdir, mkdir
+from fileio import prepare_data, utils
 
 import tensorflow as tf
 import model
+
+import cv2
 
 BASE_DIR = path.join('X:', 'open-images-v4')
 TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
@@ -37,3 +39,11 @@ with tf.Session() as session:
         print('Loaded', epoch, 'epochs of training at', index)
 
     image_files = listdir(TRAIN_DIR)
+
+    for i in range(index, len(image_files)):
+        image_name = str(image_files[i])
+
+        color_image = cv2.imread(str(path.join(TRAIN_COLOR_DIR, image_name)))
+        color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+        grayscale_image = cv2.imread(str(path.join(TRAIN_DIR, image_name)),
+                                     cv2.IMREAD_GRAYSCALE)
