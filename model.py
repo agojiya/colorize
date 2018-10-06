@@ -27,6 +27,7 @@ def create_model_layer(generator_input, structure, label):
             name = label + '-' + str(i) + '-' + str(layer_index)
             layer = tf.layers.conv2d(inputs=layers[-1], filters=1,
                                      kernel_size=structure[2 * i + 1],
-                                     activation=tf.nn.relu, name=name)
+                                     activation=tf.nn.relu,
+                                     padding="same", name=name)
             layers.append(layer)
     return tf.multiply(layers[-1], CONSTANT_255)
