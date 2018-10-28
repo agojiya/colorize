@@ -12,7 +12,7 @@ TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
 TRAIN_DIR = path.join(BASE_DIR, 'train_grayscale')
 
 SAVE_DIR = path.join(BASE_DIR, 'colorize_saves')
-SAVER_FORMAT = 'conv2d_3-{}-{}'
+SAVER_FORMAT = 'conv2d_T-{}-{}'
 if not path.exists(SAVE_DIR):
     mkdir(SAVE_DIR)
 
@@ -41,21 +41,20 @@ with tf.Session() as session:
 
     image_files = listdir(TRAIN_DIR)
 
-    for i in range(index, len(image_files)):
-        image_name = str(image_files[i])
+    test_image_file = image_files[0]
+    grayscale_image = cv2.imread(str(path.join(TRAIN_DIR, test_image_file)),
+                                 cv2.IMREAD_GRAYSCALE)
+    grayscale_shape = grayscale_image.shape
+    grayscale_image = np.reshape(grayscale_image, (1,
+                                                   grayscale_shape[0],
+                                                   grayscale_shape[1],
+                                                   1))
+    print("Running")
+    out = session.run(colorizer_out, feed_dict={grayscale_in: grayscale_image})
+    print("done")
 
-        color_image = cv2.imread(str(path.join(TRAIN_COLOR_DIR, image_name)))
-        color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
-        color_shape = color_image_rgb.shape
-        color_image_rgb = np.reshape(color_image_rgb, (1,
-                                                       color_shape[0],
-                                                       color_shape[1],
-                                                       color_shape[2]))
-
-        grayscale_image = cv2.imread(str(path.join(TRAIN_DIR, image_name)),
-                                     cv2.IMREAD_GRAYSCALE)
-        grayscale_shape = grayscale_image.shape
-        grayscale_image = np.reshape(grayscale_image, (1,
-                                                       grayscale_shape[0],
-                                                       grayscale_shape[1],
-                                                       1))
+    # Display the gray and (untrained) color images
+    cv2.imshow('gray', np.reshape(grayscale_image, grayscale_shape))
+    cv2.imshow('color', cv2.cvtColor(out[0], cv2.COLOR_RGB2BGR))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
