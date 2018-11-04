@@ -5,8 +5,8 @@ CHANNEL_LABELS = ['R', 'G', 'B']
 
 
 def create_model(grayscale_in):
-    conv_counts = [1, 1, 1]
-    kernel_sizes = [6, 4, 2]
+    conv_counts = [1, 1, 1, 1, 1, 1]
+    kernel_sizes = [2, 4, 4, 6, 6, 6]
 
     layers = [grayscale_in]
     for i in range(len(conv_counts)):
@@ -47,4 +47,7 @@ def create_model(grayscale_in):
               channel_layers[1][-1],
               channel_layers[2][-1]]
     stacked_output = tf.stack(output, axis=3)
-    return stacked_output
+    shape = tf.shape(grayscale_in)
+    return tf.image.resize_image_with_crop_or_pad(image=stacked_output,
+                                                  target_height=shape[1],
+                                                  target_width=shape[2])
