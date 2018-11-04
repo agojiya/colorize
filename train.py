@@ -36,6 +36,11 @@ def get_image(image_path, read_mode, cvt_mode=None):
     return image
 
 
+def get_save_params(epoch, index, length):
+    return (epoch + 1 if index == length - 1 else epoch,
+            0 if index == length - 1 else index + 1)
+
+
 grayscale_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
 color_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])
 colorizer_out = model.create_model(grayscale_in)
@@ -72,3 +77,8 @@ with tf.Session() as session:
                                                color_in: color_image})
         loss_per_pixel = image_loss / np.size(grayscale_image)
         print(loss_per_pixel)
+
+    save_params = get_save_params(epoch, i, length)
+    saver.save(session, save_path=path.join(SAVE_DIR,
+                                            SAVER_FORMAT.format(*save_params)))
+    print("Saved epoch {} at index {}".format(*save_params))
