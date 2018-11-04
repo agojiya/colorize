@@ -7,6 +7,8 @@ import model
 import cv2
 import numpy as np
 
+N_TARGET_IMAGES = 10
+
 BASE_DIR = path.join('X:', 'open-images-v4')
 TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
 TRAIN_DIR = path.join(BASE_DIR, 'train_grayscale')
@@ -20,6 +22,19 @@ prepare_data.convert_to_grayscale(color_dir=TRAIN_COLOR_DIR,
                                   grayscale_dir=TRAIN_DIR)
 prepare_data.filter_by_stddev(color_dir=TRAIN_COLOR_DIR,
                               grayscale_dir=TRAIN_DIR)
+
+
+def get_image(image_path, read_mode, cvt_mode=None):
+    image = cv2.imread(image_path, read_mode)
+    if cvt_mode is not None:
+        image = cv2.cvtColor(image, cvt_mode)
+    image_shape = image.shape
+    image = np.reshape(image, (1,
+                               image_shape[0],
+                               image_shape[1],
+                               1 if len(image_shape) < 3 else image_shape[2]))
+    return image
+
 
 grayscale_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
 colorizer_out = model.create_model(grayscale_in)
@@ -38,23 +53,18 @@ with tf.Session() as session:
         save_file = SAVER_FORMAT.format(epoch, index)
         saver.restore(session, save_path=str(path.join(SAVE_DIR, save_file)))
         print('Loaded', epoch, 'epochs of training at', index)
+    else:
+        epoch = 1
 
+    width = len(str(N_TARGET_IMAGES))
     image_files = listdir(TRAIN_DIR)
-
-    test_image_file = image_files[0]
-    grayscale_image = cv2.imread(str(path.join(TRAIN_DIR, test_image_file)),
-                                 cv2.IMREAD_GRAYSCALE)
-    grayscale_shape = grayscale_image.shape
-    grayscale_image = np.reshape(grayscale_image, (1,
-                                                   grayscale_shape[0],
-                                                   grayscale_shape[1],
-                                                   1))
-    print("Running")
-    out = session.run(colorizer_out, feed_dict={grayscale_in: grayscale_image})
-    print("done")
-
-    # Display the gray and (untrained) color images
-    cv2.imshow('gray', np.reshape(grayscale_image, grayscale_shape))
-    cv2.imshow('color', cv2.cvtColor(out[0], cv2.COLOR_RGB2BGR))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    length = len(image_files)
+    for i in range(index, min(index + N_TARGET_IMAGES, length)):
+        image_file = image_files[i]
+        print(str(i + 1).zfill(width) + '/' + str(N_TARGET_IMAGES),
+              image_file + ' ', end='', flush=True)
+        grayscale_image = get_image(str(path.join(TRAIN_DIR, image_file)),
+                                    cv2.IMREAD_GRAYSCALE)
+        color_image = get_image(str(path.join(TRAIN_COLOR_DIR, image_file)),
+                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2RGB)
+        print('loaded')
