@@ -7,6 +7,8 @@ import model
 import cv2
 import numpy as np
 
+from image_utils import get_image
+
 N_TARGET_IMAGES = 10
 
 BASE_DIR = path.join('X:', 'open-images-v4')
@@ -22,18 +24,6 @@ prepare_data.convert_to_grayscale(color_dir=TRAIN_COLOR_DIR,
                                   grayscale_dir=TRAIN_DIR)
 prepare_data.filter_by_stddev(color_dir=TRAIN_COLOR_DIR,
                               grayscale_dir=TRAIN_DIR)
-
-
-def get_image(image_path, read_mode, cvt_mode=None):
-    image = cv2.imread(image_path, read_mode)
-    if cvt_mode is not None:
-        image = cv2.cvtColor(image, cvt_mode)
-    image_shape = image.shape
-    image = np.reshape(image, (1,
-                               image_shape[0],
-                               image_shape[1],
-                               1 if len(image_shape) < 3 else image_shape[2]))
-    return image
 
 
 def get_save_params(epoch, index, length):
