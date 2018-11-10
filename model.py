@@ -5,18 +5,23 @@ CHANNEL_LABELS = ['R', 'G', 'B']
 
 
 def create_model(grayscale_in):
-    conv_counts = [1, 1, 1, 1, 1, 1]
-    kernel_sizes = [2, 4, 4, 6, 6, 6]
+    """ Creating a convolution section similar to
+    https://arxiv.org/abs/1409.1556 (VGG-16) and transposed convolution
+    sections for each channel similar to https://arxiv.org/abs/1505.04366 """
+    conv_counts = [2, 2, 2, 3, 3]
+    kernel_sizes = [3, 3, 3, 3, 3]
+    filter_counts = [32, 64, 128, 128, 128]
 
     layers = [grayscale_in]
     for i in range(len(conv_counts)):
         count = conv_counts[i]
         kernel_size = kernel_sizes[i]
+        filter_count = filter_counts[i]
         for j in range(count):
-            layer = tf.layers.conv2d(inputs=layers[-1], filters=16,
+            layer = tf.layers.conv2d(inputs=layers[-1], filters=filter_count,
                                      kernel_size=kernel_size,
                                      activation=tf.nn.relu, padding="same",
-                                     name="c2d-{}".format(i + j + 1))
+                                     name="c2d-{}-{}".format(i + 1, j + 1))
             layers.append(layer)
         pool_layer = tf.layers.max_pooling2d(inputs=layers[-1], pool_size=2,
                                              strides=2, padding="same",
@@ -24,6 +29,7 @@ def create_model(grayscale_in):
         layers.append(pool_layer)
 
     kernel_sizes_reversed = list(reversed(kernel_sizes))
+    filter_counts_reversed = list(reversed(filter_counts))
     red_layers, green_layers, blue_layers = [layers[-1]], \
                                             [layers[-1]], \
                                             [layers[-1]]
@@ -32,8 +38,10 @@ def create_model(grayscale_in):
         for i in range(len(conv_counts)):
             prev_layer = channel_layers[channel][-1]
             kernel_size = kernel_sizes_reversed[i]
+            filter_count = filter_counts_reversed[i]
             layer_name = "c2dT-{}-{}".format(CHANNEL_LABELS[channel], i + 1)
-            layer = tf.layers.conv2d_transpose(inputs=prev_layer, filters=16,
+            layer = tf.layers.conv2d_transpose(inputs=prev_layer,
+                                               filters=filter_count,
                                                kernel_size=kernel_size,
                                                strides=2,
                                                activation=tf.nn.relu,
