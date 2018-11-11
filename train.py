@@ -9,7 +9,7 @@ import numpy as np
 
 from image_utils import get_image
 
-N_TARGET_IMAGES = 10
+N_TARGET_IMAGES = 1000
 
 BASE_DIR = path.join('X:', 'open-images-v4')
 TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
@@ -50,12 +50,12 @@ with tf.Session() as session:
     else:
         epoch = 1
 
-    width = len(str(N_TARGET_IMAGES))
+    width = len(str(index + N_TARGET_IMAGES))
     image_files = listdir(TRAIN_DIR)
     length = len(image_files)
     for i in range(index, min(index + N_TARGET_IMAGES, length)):
         image_file = image_files[i]
-        print(str(i + 1).zfill(width) + '/' + str(N_TARGET_IMAGES),
+        print(str(i + 1).zfill(width) + '/' + str(index + N_TARGET_IMAGES),
               image_file + ': ', end='', flush=True)
         grayscale_image = get_image(str(path.join(TRAIN_DIR, image_file)),
                                     cv2.IMREAD_GRAYSCALE)
