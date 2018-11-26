@@ -10,7 +10,7 @@ def create_model(grayscale_in):
     sections for each channel similar to https://arxiv.org/abs/1505.04366 """
     conv_counts = [2, 2, 2, 3, 3]
     kernel_sizes = [3, 3, 3, 3, 3]
-    filter_counts = [32, 64, 128, 128, 128]
+    filter_counts = [32, 64, 128, 256, 512]
 
     layers = [grayscale_in]
     for i in range(len(conv_counts)):
