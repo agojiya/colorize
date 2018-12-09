@@ -13,17 +13,11 @@ N_TARGET_IMAGES = 1000
 
 BASE_DIR = path.join('X:', 'open-images-v4')
 TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
-TRAIN_DIR = path.join(BASE_DIR, 'train_grayscale')
 
 SAVE_DIR = path.join(BASE_DIR, 'colorize_saves')
 SAVER_FORMAT = 'conv2d_T-{}-{}'
 if not path.exists(SAVE_DIR):
     mkdir(SAVE_DIR)
-
-prepare_data.convert_to_grayscale(color_dir=TRAIN_COLOR_DIR,
-                                  grayscale_dir=TRAIN_DIR)
-prepare_data.filter_by_stddev(color_dir=TRAIN_COLOR_DIR,
-                              grayscale_dir=TRAIN_DIR)
 
 
 def get_save_params(epoch, index, length):
@@ -51,13 +45,14 @@ with tf.Session() as session:
         epoch = 1
 
     width = len(str(index + N_TARGET_IMAGES))
-    image_files = listdir(TRAIN_DIR)
+    image_files = listdir(TRAIN_COLOR_DIR)
     length = len(image_files)
     for i in range(index, min(index + N_TARGET_IMAGES, length)):
         image_file = image_files[i]
         print(str(i + 1).zfill(width) + '/' + str(index + N_TARGET_IMAGES),
               image_file + ': ', end='', flush=True)
-        grayscale_image = get_image(str(path.join(TRAIN_DIR, image_file)),
+        grayscale_image = get_image(str(path.join(TRAIN_COLOR_DIR,
+                                                  image_file)),
                                     cv2.IMREAD_GRAYSCALE)
         color_image = get_image(str(path.join(TRAIN_COLOR_DIR, image_file)),
                                 cv2.IMREAD_COLOR, cv2.COLOR_BGR2RGB)
