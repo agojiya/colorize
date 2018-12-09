@@ -1,5 +1,5 @@
 from os import path, listdir, mkdir
-from fileio import prepare_data, utils
+from fileio import utils
 
 import tensorflow as tf
 import model
