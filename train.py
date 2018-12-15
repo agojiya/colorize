@@ -27,10 +27,11 @@ def get_save_params(epoch, index, length):
 
 grayscale_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
 color_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])
-colorizer_out = model.create_model(grayscale_in)
+colorizer_out = model.create_model(tf.image.random_brightness(grayscale_in,
+                                                              max_delta=20))
 
 loss = tf.reduce_sum(tf.squared_difference(colorizer_out, color_in))
-optimizer = tf.train.AdamOptimizer().minimize(loss)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss)
 
 saver = tf.train.Saver(max_to_keep=None)
 with tf.Session() as session:
@@ -55,7 +56,7 @@ with tf.Session() as session:
                                                   image_file)),
                                     cv2.IMREAD_GRAYSCALE)
         color_image = get_image(str(path.join(TRAIN_COLOR_DIR, image_file)),
-                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2RGB)
+                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2HLS)
 
         image_loss, _ = session.run([loss, optimizer],
                                     feed_dict={grayscale_in: grayscale_image,
