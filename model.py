@@ -10,7 +10,7 @@ def create_model(grayscale_in):
     sections for each channel similar to https://arxiv.org/abs/1505.04366 """
     conv_counts = [2, 2, 2, 3, 3]
     kernel_sizes = [3, 3, 3, 3, 3]
-    filter_counts = [32, 64, 128, 256, 256]
+    filter_counts = [32, 64, 128, 128, 128]
 
     layers = [grayscale_in]
     for i in range(len(conv_counts)):
@@ -56,8 +56,6 @@ def create_model(grayscale_in):
                               axis=3)
 
     shape = tf.shape(grayscale_in)
-    output = tf.image.resize_image_with_crop_or_pad(image=stacked_output,
-                                                    target_height=shape[1],
-                                                    target_width=shape[2])
-    h, s = tf.unstack(output, axis=3)
-    return tf.stack([h, tf.squeeze(grayscale_in, axis=3), s], axis=3)
+    return tf.image.resize_image_with_crop_or_pad(image=stacked_output,
+                                                  target_height=shape[1],
+                                                  target_width=shape[2])

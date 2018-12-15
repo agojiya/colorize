@@ -26,12 +26,12 @@ def get_save_params(epoch, index, length):
 
 
 grayscale_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 1])
-color_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 3])
+color_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 2])
 colorizer_out = model.create_model(tf.image.random_brightness(grayscale_in,
                                                               max_delta=20))
 
 loss = tf.reduce_sum(tf.squared_difference(colorizer_out, color_in))
-optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss)
+optimizer = tf.train.AdamOptimizer().minimize(loss)
 
 saver = tf.train.Saver(max_to_keep=None)
 with tf.Session() as session:
@@ -56,11 +56,11 @@ with tf.Session() as session:
                                                   image_file)),
                                     cv2.IMREAD_GRAYSCALE)
         color_image = get_image(str(path.join(TRAIN_COLOR_DIR, image_file)),
-                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2HLS)
+                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2HLS)[0]
+        color_image_hs = cv2.merge([color_image[:, :, 0],
+                                    color_image[:, :, 2]])
+        color_image_hs = np.expand_dims(color_image_hs, axis=0)
 
-        image_loss, _ = session.run([loss, optimizer],
-                                    feed_dict={grayscale_in: grayscale_image,
-                                               color_in: color_image})
         loss_per_pixel = image_loss / np.size(grayscale_image)
         print(loss_per_pixel)
 
