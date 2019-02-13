@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 CONSTANT_255 = tf.constant(255, dtype=tf.float32)
-CHANNEL_LABELS = ['H', 'S']
+CHANNEL_LABELS = ['A', 'B']
 
 
 def create_model(grayscale_in):
@@ -31,10 +31,9 @@ def create_model(grayscale_in):
 
     kernel_sizes_reversed = list(reversed(kernel_sizes))
     filter_counts_reversed = list(reversed(filter_counts))
-    hue_layers, sat_layers = [layers[-1]], \
-                             [layers[-1]]
-    channel_layers = [hue_layers, sat_layers]
     for channel in range(2):
+    a_layers, b_layers = [layers[-1]], [layers[-1]]
+    channel_layers = [a_layers, b_layers]
         for i in range(len(conv_counts)):
             prev_layer = channel_layers[channel][-1]
             kernel_size = kernel_sizes_reversed[i]
@@ -44,7 +43,7 @@ def create_model(grayscale_in):
                                                filters=filter_count,
                                                kernel_size=kernel_size,
                                                strides=2,
-                                               activation=tf.nn.relu,
+                                               activation=tf.nn.tanh,
                                                padding="same",
                                                name=layer_name)
             channel_layers[channel].append(layer)

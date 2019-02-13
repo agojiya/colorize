@@ -15,7 +15,7 @@ BASE_DIR = path.join('X:', 'open-images-v4')
 TRAIN_COLOR_DIR = path.join(BASE_DIR, 'train')
 
 SAVE_DIR = path.join(BASE_DIR, 'colorize_saves')
-SAVER_FORMAT = 'conv2d_T-{}-{}'
+SAVER_FORMAT = 'VGG_mirrored-Lab_space-{}-{}'
 if not path.exists(SAVE_DIR):
     mkdir(SAVE_DIR)
 
@@ -30,7 +30,7 @@ color_in = tf.placeholder(dtype=tf.float32, shape=[None, None, None, 2])
 colorizer_out = model.create_model(tf.image.random_brightness(grayscale_in,
                                                               max_delta=20))
 
-loss = tf.reduce_sum(tf.squared_difference(colorizer_out, color_in))
+loss = tf.losses.mean_squared_error(colorizer_out, color_in)
 optimizer = tf.train.AdamOptimizer().minimize(loss)
 
 saver = tf.train.Saver(max_to_keep=None)
@@ -56,13 +56,16 @@ with tf.Session() as session:
                                                   image_file)),
                                     cv2.IMREAD_GRAYSCALE)
         color_image = get_image(str(path.join(TRAIN_COLOR_DIR, image_file)),
-                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2HLS)[0]
-        color_image_hs = cv2.merge([color_image[:, :, 0],
+                                cv2.IMREAD_COLOR, cv2.COLOR_BGR2Lab)[0]
+        color_image_ab = cv2.merge([color_image[:, :, 1],
                                     color_image[:, :, 2]])
-        color_image_hs = np.expand_dims(color_image_hs, axis=0)
+        color_image_ab = np.expand_dims(color_image_ab, axis=0)
 
-        loss_per_pixel = image_loss / np.size(grayscale_image)
-        print(loss_per_pixel)
+        c, image_loss, _ = session.run([colorizer_out, loss, optimizer],
+                                       feed_dict={
+                                           grayscale_in: grayscale_image,
+                                           color_in: color_image_ab})
+        print(image_loss)
 
     save_params = get_save_params(epoch, i, length)
     saver.save(session, save_path=path.join(SAVE_DIR,
